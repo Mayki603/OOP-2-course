@@ -1,43 +1,47 @@
-```mermaid
-classDiagram
-    class EditorApp {
-        +current_tool
-        +shapes
-        +max_shapes
-        +update_title()
-        +set_tool()
-        +setup_menu()
-        +redraw_all()
-        +on_press()
-        +on_drag()
-        +on_release()
-    }
-    
-    class Shape {
-        <<abstract>>
-        +x1, y1, x2, y2
-        +draw(canvas)
-    }
+@startuml
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
 
-    class PointShape {
-        +draw(canvas)
-    }
+class EditorApp {
+    +current_tool
+    +shapes
+    +max_shapes
+    +update_title()
+    +set_tool()
+    +setup_menu()
+    +redraw_all()
+    +on_press()
+    +on_drag()
+    +on_release()
+}
 
-    class LineShape {
-        +draw(canvas)
-    }
+abstract class Shape {
+    +x1, y1, x2, y2
+    +draw(canvas)
+}
 
-    class RectShape {
-        +draw(canvas)
-    }
+class PointShape {
+    +draw(canvas)
+}
 
-    class EllipseShape {
-        +draw(canvas)
-    }
+class LineShape {
+    +draw(canvas)
+}
 
-    Shape <|-- PointShape
-    Shape <|-- LineShape
-    Shape <|-- RectShape
-    Shape <|-- EllipseShape
-    EditorApp o-- Shape : містить масив
-    ```
+class RectShape {
+    +draw(canvas)
+}
+
+class EllipseShape {
+    +draw(canvas)
+}
+
+Shape <|-- PointShape
+Shape <|-- LineShape
+Shape <|-- RectShape
+Shape <|-- EllipseShape
+EditorApp o-- Shape : містить масив
+@enduml
