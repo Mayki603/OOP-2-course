@@ -47,22 +47,36 @@ class EditorApp:
         help_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Довідка", menu=help_menu)
 
+    def redraw_all(self):
+        self.canvas.delete("all")
+        for shape in self.shapes:
+            shape.draw(self.canvas)
+
     def on_press(self, event):
         if len(self.shapes) >= self.max_shapes:
             return
         self.start_x = event.x
         self.start_y = event.y
 
+        if self.current_tool == "Крапка":
+            shape = PointShape(event.x, event.y, event.x, event.y)
+            self.shapes.append(shape)
+            shape.draw(self.canvas)
+
     def on_drag(self, event):
+        if self.current_tool == "Крапка":
+            if len(self.shapes) < self.max_shapes:
+                shape = PointShape(event.x, event.y, event.x, event.y)
+                self.shapes.append(shape)
+                shape.draw(self.canvas)
+            return
+
         if self.start_x is None: 
             return
+
+        self.redraw_all()
             
-        if self.rubber_id:
-            self.canvas.delete(self.rubber_id)
-            
-        if self.current_tool == "Крапка":
-            pass 
-        elif self.current_tool == "Лінія":
+        if self.current_tool == "Лінія":
             self.rubber_id = self.canvas.create_line(
                 self.start_x, self.start_y, event.x, event.y, dash=(4, 4), fill="black")
         elif self.current_tool == "Прямокутник":
@@ -77,26 +91,26 @@ class EditorApp:
                 dash=(4, 4), outline="black")
 
     def on_release(self, event):
+        if self.current_tool == "Крапка":
+            self.start_x = None
+            self.start_y = None
+            return
+
         if self.start_x is None: 
             return
-            
-        if self.rubber_id:
-            self.canvas.delete(self.rubber_id)
-            self.rubber_id = None
 
         shape = None
-        if self.current_tool == "Крапка":
-            shape = PointShape(event.x, event.y, event.x, event.y)
-        elif self.current_tool == "Лінія":
+        if self.current_tool == "Лінія":
             shape = LineShape(self.start_x, self.start_y, event.x, event.y)
         elif self.current_tool == "Прямокутник":
             shape = RectShape(self.start_x, self.start_y, event.x, event.y)
         elif self.current_tool == "Еліпс":
             shape = EllipseShape(self.start_x, self.start_y, event.x, event.y)
 
-        if shape:
+        if shape and len(self.shapes) < self.max_shapes:
             self.shapes.append(shape)
-            shape.draw(self.canvas)
+
+        self.redraw_all()
 
         self.start_x = None
         self.start_y = None
