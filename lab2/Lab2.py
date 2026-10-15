@@ -52,23 +52,22 @@ class EditorApp:
         for shape in self.shapes:
             shape.draw(self.canvas)
 
-    def on_press(self, event):
+    def add_shape(self, shape):
         if len(self.shapes) >= self.max_shapes:
-            return
+            self.shapes.pop(0)
+        self.shapes.append(shape)
+        self.redraw_all()
+
+    def on_press(self, event):
         self.start_x = event.x
         self.start_y = event.y
 
         if self.current_tool == "Крапка":
-            shape = PointShape(event.x, event.y, event.x, event.y)
-            self.shapes.append(shape)
-            shape.draw(self.canvas)
+            self.add_shape(PointShape(event.x, event.y, event.x, event.y))
 
     def on_drag(self, event):
         if self.current_tool == "Крапка":
-            if len(self.shapes) < self.max_shapes:
-                shape = PointShape(event.x, event.y, event.x, event.y)
-                self.shapes.append(shape)
-                shape.draw(self.canvas)
+            self.add_shape(PointShape(event.x, event.y, event.x, event.y))
             return
 
         if self.start_x is None: 
@@ -107,10 +106,8 @@ class EditorApp:
         elif self.current_tool == "Еліпс":
             shape = EllipseShape(self.start_x, self.start_y, event.x, event.y)
 
-        if shape and len(self.shapes) < self.max_shapes:
-            self.shapes.append(shape)
-
-        self.redraw_all()
+        if shape:
+            self.add_shape(shape)
 
         self.start_x = None
         self.start_y = None
