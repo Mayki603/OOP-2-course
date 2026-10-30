@@ -41,6 +41,7 @@ class EditorApp:
         self.start_y = None
         self.rubber_id = None
         self.tool_buttons = {}
+        self.icons = {}
         
         self.setup_menu()
         self.setup_toolbar()
@@ -53,6 +54,34 @@ class EditorApp:
         self.canvas.bind("<ButtonRelease-1>", self.on_release)
         
         self.update_menu_and_title()
+
+    def create_icon(self, tool_type):
+        img = tk.PhotoImage(width=24, height=24)
+        img.put("#f0f0f0", to=(0, 0, 24, 24))
+        
+        if tool_type == "Крапка":
+            for x in range(24):
+                for y in range(24):
+                    if (x - 12)**2 + (y - 12)**2 <= 16:
+                        img.put("black", (x, y))
+        elif tool_type == "Лінія":
+            for i in range(5, 19):
+                img.put("black", (i, i))
+                img.put("black", (i+1, i))
+        elif tool_type == "Прямокутник":
+            for x in range(4, 20):
+                img.put("black", (x, 4))
+                img.put("black", (x, 19))
+            for y in range(4, 20):
+                img.put("black", (4, y))
+                img.put("black", (19, y))
+        elif tool_type == "Еліпс":
+            for x in range(24):
+                for y in range(24):
+                    val = ((x - 12) / 8)**2 + ((y - 12) / 5)**2
+                    if 0.7 <= val <= 1.3:
+                        img.put("black", (x, y))
+        return img
 
     def set_tool(self, tool_name):
         self.current_tool = tool_name
@@ -102,11 +131,15 @@ class EditorApp:
         ]
         
         for name, hint in tools:
+            icon = self.create_icon(name)
+            self.icons[name] = icon
+            
             btn = tk.Button(
-                toolbar, text=name, command=lambda n=name: self.set_tool(n), 
-                width=12, relief=tk.RAISED
+                toolbar, image=icon,
+                command=lambda n=name: self.set_tool(n), 
+                padx=4, pady=4, relief=tk.RAISED
             )
-            btn.pack(side=tk.LEFT, padx=2, pady=2)
+            btn.pack(side=tk.LEFT, padx=3, pady=2)
             ToolTip(btn, hint)
             self.tool_buttons[name] = btn
             
